@@ -320,7 +320,7 @@ public class BillListPanel extends BillPanel {
 		BillListPanel.datalength = datalength;
 	}
 
-	private BillListPanel() {
+	public BillListPanel() {
 	}
 
 	public BillListPanel(String _templetcode) {
@@ -6931,6 +6931,7 @@ public class BillListPanel extends BillPanel {
 				}
 			}
 			//sunfujun/20120720/解决表头红星问题
+			itemVO.isViewColumn();
 			String str_realText = getTBUtil().getLableRealText(str_text, ClientEnvironment.getInstance().isAdmin(), _ismustinput && isHeadShowAsterisk(), itemVO.isViewColumn(), itemVO.isNeedSave(), isHeadShowAsterisk()); //
 			label.setText(str_realText); ////
 			label.setToolTipText(str_tooltiptext); //

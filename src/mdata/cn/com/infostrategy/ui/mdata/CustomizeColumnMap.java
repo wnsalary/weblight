@@ -84,7 +84,7 @@ public class CustomizeColumnMap extends HashMap implements Serializable {
 	public static BillListColBean getCustomizeBean(String _templetName) {
 		CustomizeColumnMap map = getCustomizeColMap();
 		BillListColBean colbean = null;
-		if (map != null) {
+		if (map != null && map.size()>0) {//zzl[2020-5-14] map.size>0  严格判断
 			if (map.get(_templetName.toUpperCase()) == null) {//流程处理界面，点击【查看常用意见】这里为空，故需要判断一下【李春娟/2014-12-29】
 				return null;
 			}
