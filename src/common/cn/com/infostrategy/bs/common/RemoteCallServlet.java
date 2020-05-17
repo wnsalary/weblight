@@ -485,7 +485,7 @@ public class RemoteCallServlet extends HttpServlet { //implements SingleThreadMo
 
 	/**
 	 * 输出到客户端...
-	 * @param __response
+	 * @param _response
 	 * @param _returnVO
 	 */
 	private String outPutToclient(ServletResponse _response, RemoteCallReturnVO _returnVO) {
