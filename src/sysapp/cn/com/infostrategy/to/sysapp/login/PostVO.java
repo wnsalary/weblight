@@ -38,7 +38,26 @@ public class PostVO implements Serializable {
 	private String blDept_bl_shiybfb; //所属机构之所属事业部分部.
 	private String blDept_bl_shiybfb_name; //所属机构之所属事业部分部名称.
 
+	private String corpdistinct;//zzl[2020-5-19] 添加机构是否涉农类型
+	private String corpclass;//zzl[2020-5-19] 添加机构涉农的分类
+
 	private boolean isDefault; //是否是默认岗位,即在一个人所属的多个岗位中,只有一个岗位是默认岗位!!然后在所有处理业务功能点时,都是按默认岗位进行的!也就意味着需要二次登录,切换岗位!!这个功能非常关键与重要!!
+
+	public String getCorpdistinct() {
+		return corpdistinct;
+	}
+
+	public void setCorpdistinct(String corpdistinct) {
+		this.corpdistinct = corpdistinct;
+	}
+
+	public String getCorpclass() {
+		return corpclass;
+	}
+
+	public void setCorpclass(String corpclass) {
+		this.corpclass = corpclass;
+	}
 
 	public String getId() {
 		return id;

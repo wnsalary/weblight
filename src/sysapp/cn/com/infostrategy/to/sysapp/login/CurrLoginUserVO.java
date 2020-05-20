@@ -80,6 +80,9 @@ public class CurrLoginUserVO implements Serializable {
 	private String blDept_bl_shiybfb_name; //该人员所属岗位所属机构之所属事业部分部名称.
 	private int securitylevel;//该人员的密级
 
+	private String corpdistinct;//zzl[2020-5-19] 添加机构是否涉农类型
+	private String corpclass;//zzl[2020-5-19] 添加机构涉农的分类
+
 	private boolean isCorpDeptAdmin = false; //是否是机构管理员
 	private int lookAndFeelType = 0; //
 
@@ -94,6 +97,23 @@ public class CurrLoginUserVO implements Serializable {
 	private int fontrevise  = 0 ; //字体放大号数
 	
 	private Map<String, String> roleMap;//所拥有的角色
+
+	public String getCorpdistinct() {
+		return corpdistinct;
+	}
+
+	public void setCorpdistinct(String corpdistinct) {
+		this.corpdistinct = corpdistinct;
+	}
+
+	public String getCorpclass() {
+		return corpclass;
+	}
+
+	public void setCorpclass(String corpclass) {
+		this.corpclass = corpclass;
+	}
+
 
 	public String getId() {
 		return id;

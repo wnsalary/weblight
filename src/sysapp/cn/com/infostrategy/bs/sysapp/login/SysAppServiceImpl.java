@@ -531,7 +531,7 @@ public class SysAppServiceImpl implements SysAppServiceIfc {
 		// 补上机构信息,因为老划以前的民生版本,在pub_user表中有字段pk_dept,pk_dept2,pk_dept3..
 		String str_pk_dept = hvos_user[0].getStringValue("pk_dept"); // 王钢,春娟等一直在使用这个字段!!!则去查一下这个表!
 		if (str_pk_dept != null && !str_pk_dept.equals("")) { // 如果有机构..
-			HashVO[] hvs_corps = getDMO().getHashVoArrayByDS(null, "select id,code,name,linkcode,corptype from pub_corp_dept where id=" + str_pk_dept); // //
+			HashVO[] hvs_corps = getDMO().getHashVoArrayByDS(null, "select id,code,name,linkcode,corptype,corpdistinct,corpclass from pub_corp_dept where id=" + str_pk_dept); // //
 			if (hvs_corps != null && hvs_corps.length > 0) { // 如果的确找到了机构,因为可能脏数据而关联不上了!
 				for (int i = 0; i < hvs_corps.length; i++) { // 遍历每个机构!!
 					if (hvs_corps[i].getStringValue("id", "").equals(str_pk_dept)) { // 如果该机构与登录人员的机构1匹配上了,则设置!
@@ -539,6 +539,8 @@ public class SysAppServiceImpl implements SysAppServiceIfc {
 						hvos_user[0].setAttributeValue("pk_dept_name", hvs_corps[i].getStringValue("name")); //
 						hvos_user[0].setAttributeValue("pk_dept_linkcode", hvs_corps[i].getStringValue("linkcode")); //
 						hvos_user[0].setAttributeValue("pk_dept_corptype", hvs_corps[i].getStringValue("corptype")); //
+						hvos_user[0].setAttributeValue("corpdistinct", hvs_corps[i].getStringValue("corpdistinct")); //
+						hvos_user[0].setAttributeValue("corpclass", hvs_corps[i].getStringValue("corpclass")); //
 					}
 				}
 			}
@@ -566,6 +568,8 @@ public class SysAppServiceImpl implements SysAppServiceIfc {
 		userVO.setDeptname(hvos_user[0].getStringValue("pk_dept_name")); // 部门名称
 		userVO.setDeptlinkcode(hvos_user[0].getStringValue("pk_dept_linkcode")); // 部门关联码!!!
 		userVO.setDeptCorpType(hvos_user[0].getStringValue("pk_dept_corptype")); // 部门关联码!!!
+		userVO.setCorpdistinct(hvos_user[0].getStringValue("corpdistinct")); // zzl 取得机构类型
+		userVO.setCorpclass(hvos_user[0].getStringValue("corpclass")); //zzl  取得机构的涉农类型
 
 		userVO.setDeskTopStyle(hvos_user[0].getStringValue("DeskTopStyle", "A")); // 默认是1,即抽屉风格!
 		userVO.setLookAndFeelType(hvos_user[0].getIntegerValue("lookandfeeltype", 0)); // 如果为空,则使用代码中写死的中铁风格的!!!
@@ -638,7 +642,8 @@ public class SysAppServiceImpl implements SysAppServiceIfc {
 
 				postVOs[i].setBlDept_bl_shiybfb(hvos_post[i].getStringValue("userdept_bl_shiybfb")); // 岗位所属机构之所属事业部分部
 				postVOs[i].setBlDept_bl_shiybfb_name(hvos_post[i].getStringValue("userdept_bl_shiybfb_name")); // 岗位所属机构之所属事业部分部名称
-
+				postVOs[i].setCorpdistinct(hvos_post[i].getStringValue("corpdistinct"));
+				postVOs[i].setCorpclass(hvos_post[i].getStringValue("corpclass"));
 				postVOs[i].setDefault(hvos_post[i].getBooleanValue("isdefault", false)); // 是否默认岗位,如果为空则返回false.
 			}
 			userVO.setPostVOs(postVOs); // 所有的岗位与机构..
@@ -770,6 +775,8 @@ public class SysAppServiceImpl implements SysAppServiceIfc {
 		sb_sql.append("t2.name rolename,"); //
 		sb_sql.append("t1.userdept userdeptpk,");
 		sb_sql.append("t3.code userdeptcode,");
+		sb_sql.append("t3.corpdistinct corpdistinct,");
+		sb_sql.append("t3.corpclass corpclass,");
 		sb_sql.append("t3.name userdeptname ");
 		sb_sql.append("from pub_user_role t1 "); //
 		sb_sql.append("left join pub_role t2 on t1.roleid=t2.id ");
@@ -812,6 +819,8 @@ public class SysAppServiceImpl implements SysAppServiceIfc {
 		sb_sql.append("t3.bl_shiyb         userdept_bl_shiyb,"); // 所属机构之所属事业部
 		sb_sql.append("t3.bl_shiyb_name    userdept_bl_shiyb_name,"); // 所属机构之所属事业部名称
 		sb_sql.append("t3.bl_shiybfb       userdept_bl_shiybfb,"); // 所属机构之所属事业部分部
+		sb_sql.append("t3.corpdistinct       corpdistinct,"); // zzl 得到机构涉农类型
+		sb_sql.append("t3.corpclass       corpclass,"); // zzl 得到机构的涉农类别
 		sb_sql.append("t3.bl_shiybfb_name  userdept_bl_shiybfb_name "); // 所属机构之所属事业部分部名称
 		sb_sql.append("from pub_user_post t1 "); // 关系表..
 		sb_sql.append("left join pub_post t2 on t1.postid=t2.id "); //

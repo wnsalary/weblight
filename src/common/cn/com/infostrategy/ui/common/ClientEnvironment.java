@@ -236,13 +236,28 @@ public final class ClientEnvironment implements Serializable {
 	}
 
 	/**
+	 * zzl 取得登录用户所属网点是否涉农
+	 * @return
+	 */
+	public static String getLoginUserDeptCorpdistinct() {
+		return getCurrLoginUserVO().getCorpdistinct(); //
+	}
+
+	/**
+	 * zzl 取得登录用户机构涉农类型
+	 * @return
+	 */
+	public static String getLoginUserDeptCorpclass() {
+		return getCurrLoginUserVO().getCorpclass(); //
+	}
+
+	/**
 	 * 取得登录用户所属部门名称
 	 * @return
 	 */
 	public static String getLoginUserDeptName() {
 		return getCurrLoginUserVO().getDeptname(); //
 	}
-
 	/**
 	 * 取得登录用户所属部门主键
 	 * @return
