@@ -46,9 +46,9 @@ public class FtpDealUtil {
 		}
 	}
 
-	/** 
+	/**
 	* 将一个二进制内容以某个文件名上传到FTP服务器上,!!!
-	* 上传文件只能使用二进制模式，当文件存在时再次上传则会覆盖!!! 
+	* 上传文件只能使用二进制模式，当文件存在时再次上传则会覆盖!!!
 	* _fileName是从根目录开始带路径的,比如[/dir1/dir2/test.txt] ,如果文件想直接存储在根目录下,则也要写[/test.txt]
 	*/
 	public void upFile(String _ip, int _port, String _user, String _pwd, byte[] _dataBytes, String _fileName) throws Exception {
@@ -60,12 +60,12 @@ public class FtpDealUtil {
 
 		TelnetOutputStream ftpOut = ftpclient.put(_fileName);
 		ftpOut.write(_dataBytes, 0, _dataBytes.length); //写数据!
-		//ftpOut.flush(); 
+		//ftpOut.flush();
 		ftpOut.close();
 
 		//退出FTP连接!!
 		ftpclient.sendServer("QUIT\r\n");
-		int reply = ftpclient.readServerResponse(); //取得服务器的返回信息 
+		int reply = ftpclient.readServerResponse(); //取得服务器的返回信息
 	}
 
 	/**
@@ -98,15 +98,15 @@ public class FtpDealUtil {
 		return return_arraybyte;
 	}
 
-	/** 
-	* 在FTP服务器上建立指定的目录,当目录已经存在的情下不会影响目录下的文件,这样用以判断FTP 
-	* 上传文件时保证目录的存在目录格式必须以"/"根目录开头 
-	* @param pathList String 
-	* @throws Exception 
+	/**
+	* 在FTP服务器上建立指定的目录,当目录已经存在的情下不会影响目录下的文件,这样用以判断FTP
+	* 上传文件时保证目录的存在目录格式必须以"/"根目录开头
+	* @param pathList String
+	* @throws Exception
 	*/
 	public void mkDirRes(FtpClient _ftpclient, String _path) throws Exception {
 		_ftpclient.ascii();
-		StringTokenizer s = new StringTokenizer(_path, "/"); //sign 
+		StringTokenizer s = new StringTokenizer(_path, "/"); //sign
 		int count = s.countTokens(); //
 		String pathName = "";
 		while (s.hasMoreElements()) {
@@ -121,31 +121,31 @@ public class FtpDealUtil {
 		_ftpclient.binary();
 	}
 
-	/** 
-	* 取得指定目录下的所有文件名，不包括目录名称 
-	* 分析nameList得到的输入流中的数，得到指定目录下的所有文件名 
-	* @param fullPath String 
-	* @return ArrayList 
-	* @throws Exception 
+	/**
+	* 取得指定目录下的所有文件名，不包括目录名称
+	* 分析nameList得到的输入流中的数，得到指定目录下的所有文件名
+	* @param fullPath String
+	* @return ArrayList
+	* @throws Exception
 	*/
 	public String[] listFileNames(String _ip, int _port, String _user, String _pwd, String _fullPath) throws Exception {
 		FtpClient ftpclient = new FtpClient(_ip, _port); //创建FTP连接对象!!
 		ftpclient.login(_user, _pwd); //连接..
 
-		ftpclient.ascii(); //注意，使用字符模式 
+		ftpclient.ascii(); //注意，使用字符模式
 		TelnetInputStream list = ftpclient.nameList(_fullPath); //
 		byte[] names = new byte[20480];
 		int bufsize = 0;
-		bufsize = list.read(names, 0, names.length); //从流中读取 
+		bufsize = list.read(names, 0, names.length); //从流中读取
 		list.close();
 		ArrayList namesList = new ArrayList();
 		int i = 0;
 		int j = 0;
 		while (i < bufsize) {
-			if (names[i] == 10) { //字符模式为10，二进制模式为13  
+			if (names[i] == 10) { //字符模式为10，二进制模式为13
 				String tempName = new String(names, j, i - j);
 				namesList.add(tempName);
-				j = i + 1; //上一次位置字符模式 
+				j = i + 1; //上一次位置字符模式
 			}
 			i = i + 1;
 		}

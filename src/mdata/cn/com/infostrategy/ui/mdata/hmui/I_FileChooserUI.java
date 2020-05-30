@@ -24,7 +24,7 @@ public class I_FileChooserUI extends MetalFileChooserUI {
 		return new FilterComboBoxModel1();
 	}
 
-	protected class FilterComboBoxModel1 extends FilterComboBoxModel implements ComboBoxModel, PropertyChangeListener {		
+	protected class FilterComboBoxModel1 extends FilterComboBoxModel implements ComboBoxModel, PropertyChangeListener {
 		private static final long serialVersionUID = 7118417568824741943L;
 		protected FileFilter[] filters;
 
