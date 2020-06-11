@@ -7,6 +7,7 @@ import cn.com.infostrategy.to.common.WLTLogger;
 import cn.com.infostrategy.to.mdata.InsertSQLBuilder;
 import cn.com.infostrategy.to.mdata.RefItemVO;
 import cn.com.infostrategy.ui.common.*;
+import cn.com.infostrategy.ui.mdata.BillCardDialog;
 import cn.com.infostrategy.ui.mdata.BillListHtmlHrefEvent;
 import cn.com.infostrategy.ui.mdata.BillListHtmlHrefListener;
 
@@ -33,7 +34,6 @@ import java.util.concurrent.Executors;
  */
 public class BigFileUpload extends AbstractWorkPanel implements BillListHtmlHrefListener, ActionListener {
     WLTButton excel_btn = new WLTButton("数据导入");
-    private String count = TBUtil.getTBUtil().getSysOptionStringValue("大文本数据上传参数", "");//zzl[2020-5-26]
     //zzl tablename=表名 fileType=文件格式
     private String tableName,fileType;
     private String selectDate = "";
@@ -44,12 +44,6 @@ public class BigFileUpload extends AbstractWorkPanel implements BillListHtmlHref
     private int countjv=0;
     private Logger logger = WLTLogger.getLogger(RemoteCallServlet.class);
     public void initialize() {
-        String [] str=count.split(",");
-        tableName=str[0].toString();
-        fileType=str[1].toString();
-        colLength=str[2].toString();
-        strFg=str[3].toString();
-        xcCount=str[4].toString();
         this.setLayout(new FlowLayout(0));
         this.excel_btn.setPreferredSize(new Dimension(100, 50));
         this.excel_btn.addActionListener(this);
@@ -64,11 +58,43 @@ public class BigFileUpload extends AbstractWorkPanel implements BillListHtmlHref
     @Override
     public void actionPerformed(ActionEvent actionEvent) {
         if(actionEvent.getSource()==this.excel_btn){
-            fileUpload();
+            if(fileUpload()==1){
+                fileChoose();
+            }
         }
 
     }
-    public void fileUpload(){
+    public int fileUpload() {
+        try {
+            BillCardDialog cardDialog = new BillCardDialog(this, "数据上传参数","WN_BIGFILE_CODE1",600,400);
+            cardDialog.setSaveBtnVisiable(false);
+            cardDialog.getBillcardPanel().setEditable("tableName",true);
+            cardDialog.getBillcardPanel().setRealValueAt("fileType", "csv");
+            cardDialog.getBillcardPanel().setRealValueAt("colLength", "200");
+            cardDialog.getBillcardPanel().setRealValueAt("strFg", "&");
+            cardDialog.getBillcardPanel().setRealValueAt("xcCount", "8");
+            cardDialog.getBillcardPanel().setEditable("fileType",false);
+            cardDialog.getBillcardPanel().setEditable("colLength",true);
+            cardDialog.getBillcardPanel().setEditable("strFg",false);
+            cardDialog.getBillcardPanel().setEditable("fileType",true);
+            cardDialog.setVisible(true);
+            if (cardDialog.getCloseType() == 1) {
+                tableName = cardDialog.getBillcardPanel().getRealValueAt("tableName");
+                tableName = UIUtil.getStringValueByDS(null, "select code from PUB_COMBOBOXDICT where 1=1  and (id='"+tableName+"' and type='薪酬_大文件数据上传')  ");
+                fileType = cardDialog.getBillcardPanel().getRealValueAt("fileType");
+                colLength = cardDialog.getBillcardPanel().getRealValueAt("colLength");
+                strFg = cardDialog.getBillcardPanel().getRealValueAt("strFg");
+                xcCount = cardDialog.getBillcardPanel().getRealValueAt("xcCount");
+                return 1;
+            } else {
+                return 0;
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            return 0;
+        }
+    }
+    public void fileChoose(){
         JFileChooser chooser = new JFileChooser();
         chooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
         chooser.setDialogTitle("请选择一个"+fileType+"文件");
@@ -119,7 +145,7 @@ public class BigFileUpload extends AbstractWorkPanel implements BillListHtmlHref
                     .lookUpRemoteService(BIgFileUploadIfc.class);
             String[] colnum=null;
             String newtableName=tableName+"_"+data.replace("-","");
-            HashVO [] vos=UIUtil.getHashVoArrayByDS(null,"select * from dba_tables where TABLE_NAME='"+newtableName.toUpperCase()+"'");
+            HashVO [] vos=UIUtil.getHashVoArrayByDS(null,"select * from dba_tables where TABLE_NAME='"+newtableName.toUpperCase()+"' and TABLESPACE_NAME='WNSALARYDB'");
             if(vos.length>0){
                 int count=MessageBox.showConfirmDialog(this,"日期"+data+"的数据已存在，点击确定覆盖，点击关闭取消");
                 if(count==0){
