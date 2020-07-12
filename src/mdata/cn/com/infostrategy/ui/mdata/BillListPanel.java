@@ -309,6 +309,7 @@ public class BillListPanel extends BillPanel {
 	private ListCellEditor_RowNumber editor = null;// 袁江晓 20131029 添加 主要获得是否选中勾选框
 	private AbstractBillListQueryCallback listQueryCallback;
 	private ExcelUtil excel = new ExcelUtil();
+	private int [] color;//zzl 修改标题颜色
 
 	private int count;
 
@@ -750,10 +751,22 @@ public class BillListPanel extends BillPanel {
 
 	}
 
+
 	public void setBillListTitleName(String _text) {
 		getTitlePanel().setVisible(true); //
 		label_temname.setText("※" + _text); //
 	}
+
+	/**
+	 * zzl 修改标题颜色
+	 * @param _text
+	 */
+	public void setBillListTitleName(String _text,int a,int b,int c) {
+		getTitlePanel().setVisible(true); //
+		label_temname.setText("※" + _text); //
+		label_temname.setForeground(new Color(a, b, c)); //106, 106, 255 149, 149, 255
+	}
+
 
 	private AbstractListCustomerButtonBarPanel getListCustPanel() {
 		if (listCustPanel != null) {
@@ -985,9 +998,8 @@ public class BillListPanel extends BillPanel {
 		if (templetVO.getTempletname() != null && !templetVO.getTempletname().trim().equals("")) {
 			label_temname.setText("※" + templetVO.getTempletname() + ""); //
 		}
-
 		label_temname.setFont(new Font("System", Font.PLAIN, 12 + LookAndFeel.getFONT_REVISE_SIZE())); //
-		label_temname.setForeground(new Color(149, 149, 255)); //106, 106, 255
+		label_temname.setForeground(new Color(149, 149, 255)); //106, 106, 255 149, 149, 255
 		label_temname.setOpaque(false);
 		return label_temname;
 	}

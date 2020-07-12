@@ -96,6 +96,12 @@ public class ExcelToDBWKPanel extends AbstractWorkPanel implements BillListHtmlH
 		btn_delete.addActionListener(this);
 		btn_upload = new WLTButton("上传数据");
 		btn_upload.addActionListener(this);
+		//2020年7月12日13:12:39  fj  非管理员权限看不到这三个按钮
+		if(!ClientEnvironment.isAdmin()){
+			btn_insert.setVisible(false);
+			btn_edit.setVisible(false);
+			btn_delete.setVisible(false);
+		}
 
 		billListPanel.addBatchBillListButton(new WLTButton[] { btn_insert, btn_edit, btn_delete, btn_upload });
 		billListPanel.repaintBillListButton();
@@ -335,14 +341,14 @@ public class ExcelToDBWKPanel extends AbstractWorkPanel implements BillListHtmlH
 			}
 		}, 366, 366).setSysMsgVisible(false);
 
-		if (exceldatas == null || exceldatas.length <= 0) {
+		if (exceldatas == null || exceldatas.length <= 0 ) {
 			MessageBox.show(this, "Excel数据为空");
 			return;
 		}
 
 		al_excel = gethavsAL(exceldatas);
 
-		if (al_excel == null || al_excel.size() <= 0) {
+		if (al_excel == null || al_excel.size() <= 0 ) {
 			MessageBox.show(this, "Excel数据为空");
 			return;
 		}
@@ -415,7 +421,7 @@ public class ExcelToDBWKPanel extends AbstractWorkPanel implements BillListHtmlH
 				String[] strs = getColname(colnum); // excel表头字母组
 				HashMap hm_fl = getFiledLength(exceldata); // excel每列数据长度
 
-				//String filename = exceldata.get("filename")+""; 
+				//String filename = exceldata.get("filename")+"";
 				String sheetname = exceldata.get("sheetname") + "";
 				String table_name = getTablename(sheetname); //excel sheet对应的表名
 
@@ -878,7 +884,12 @@ public class ExcelToDBWKPanel extends AbstractWorkPanel implements BillListHtmlH
 							HSSFCell cell = row.getCell((int) j);
 							if (cell != null) {
 
-							}//zzl[2018-12-6] 去掉了为空的判断
+							}//2020年7月12日13:05:41  fj  添加非空判断，否则表中有空格的话会报空指针
+							else if(cell == null){
+								cell = row.createCell(j);
+								cell = row.getCell(j);
+							}
+
 							String str_value = getCellValue_xls(cell, _filename, s, i, j);
 							if (str_value != null && !str_value.equals("")) {
 
@@ -952,6 +963,10 @@ public class ExcelToDBWKPanel extends AbstractWorkPanel implements BillListHtmlH
 							XSSFCell cell = row.getCell(j);
 							if (cell != null) {
 
+							}//2020年7月12日13:05:41  fj  添加非空判断，否则表中有空格的话会报空指针
+							else if(cell == null){
+								cell = row.createCell(j);
+								cell = row.getCell(j);
 							}
 							// String str_value = row.getCell(j).toString();
 							String str_value = getCellValue_xlsx(cell, _filename, s, i, j);
@@ -1045,6 +1060,7 @@ public class ExcelToDBWKPanel extends AbstractWorkPanel implements BillListHtmlH
 	// 获取xlsx单元格值
 	private String getCellValue_xlsx(XSSFCell cell, String _filename, int _sheetIndex, int row, int col) {
 		String str_value = "";
+
 		int li_cellType = cell.getCellType();
 		if (li_cellType == XSSFCell.CELL_TYPE_STRING) {
 			str_value = cell.getStringCellValue();
