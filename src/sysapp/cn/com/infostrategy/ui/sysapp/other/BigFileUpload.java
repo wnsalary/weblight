@@ -7,6 +7,7 @@ import cn.com.infostrategy.to.common.WLTLogger;
 import cn.com.infostrategy.to.mdata.InsertSQLBuilder;
 import cn.com.infostrategy.to.mdata.RefItemVO;
 import cn.com.infostrategy.ui.common.*;
+import cn.com.infostrategy.ui.common.LookAndFeel;
 import cn.com.infostrategy.ui.mdata.BillCardDialog;
 import cn.com.infostrategy.ui.mdata.BillListHtmlHrefEvent;
 import cn.com.infostrategy.ui.mdata.BillListHtmlHrefListener;
@@ -18,13 +19,15 @@ import javax.swing.*;
 import javax.swing.filechooser.FileFilter;
 import javax.swing.filechooser.FileNameExtensionFilter;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
+import java.awt.event.*;
 import java.io.*;
+import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+
+import static cn.com.infostrategy.to.common.TBUtil.getTBUtil;
 
 
 /**
@@ -40,6 +43,7 @@ public class BigFileUpload extends AbstractWorkPanel implements BillListHtmlHref
     private String colLength = "";//列的值
     private String strFg="";//文本分隔符合
     private String xcCount="";//线程数
+    private String xxtype="";//导入类别
     private ExecutorService executor;
     private int countjv=0;
     private Logger logger = WLTLogger.getLogger(RemoteCallServlet.class);
@@ -57,12 +61,11 @@ public class BigFileUpload extends AbstractWorkPanel implements BillListHtmlHref
 
     @Override
     public void actionPerformed(ActionEvent actionEvent) {
-        if(actionEvent.getSource()==this.excel_btn){
-            if(fileUpload()==1){
+        if(actionEvent.getSource()==this.excel_btn) {
+            if (fileUpload() == 1) {
                 fileChoose();
             }
         }
-
     }
     public int fileUpload() {
         try {
@@ -77,6 +80,7 @@ public class BigFileUpload extends AbstractWorkPanel implements BillListHtmlHref
             cardDialog.getBillcardPanel().setEditable("colLength",true);
             cardDialog.getBillcardPanel().setEditable("strFg",false);
             cardDialog.getBillcardPanel().setEditable("fileType",true);
+            cardDialog.getBillcardPanel().setRealValueAt("xxtype", "全量");
             cardDialog.setVisible(true);
             if (cardDialog.getCloseType() == 1) {
                 tableName = cardDialog.getBillcardPanel().getRealValueAt("tableName");
@@ -85,6 +89,7 @@ public class BigFileUpload extends AbstractWorkPanel implements BillListHtmlHref
                 colLength = cardDialog.getBillcardPanel().getRealValueAt("colLength");
                 strFg = cardDialog.getBillcardPanel().getRealValueAt("strFg");
                 xcCount = cardDialog.getBillcardPanel().getRealValueAt("xcCount");
+                xxtype = cardDialog.getBillcardPanel().getRealValueAt("xxtype");
                 return 1;
             } else {
                 return 0;
@@ -145,29 +150,44 @@ public class BigFileUpload extends AbstractWorkPanel implements BillListHtmlHref
                     .lookUpRemoteService(BIgFileUploadIfc.class);
             String[] colnum=null;
             String newtableName=tableName+"_"+data.replace("-","");
-            HashVO [] vos=UIUtil.getHashVoArrayByDS(null,"select * from dba_tables where TABLE_NAME='"+newtableName.toUpperCase()+"' and TABLESPACE_NAME='WNSALARYDB'");
-            if(vos.length>0){
-                int count=MessageBox.showConfirmDialog(this,"日期"+data+"的数据已存在，点击确定覆盖，点击关闭取消");
-                if(count==0){
-                    UIUtil.executeBatchByDS(null,new String [] {"drop table "+newtableName});
-                }else{
-                    return;
+            if(xxtype.equals("全量")){
+                HashVO [] vos=UIUtil.getHashVoArrayByDS(null,"select * from dba_tables where TABLE_NAME='"+newtableName.toUpperCase()+"' and TABLESPACE_NAME='HZDB'");
+                if(vos.length>0){
+                    int count=MessageBox.showConfirmDialog(this,"日期"+data+"的数据已存在，点击确定覆盖，点击关闭取消");
+                    if(count==0){
+                        UIUtil.executeBatchByDS(null,new String [] {"drop table "+newtableName});
+                    }else{
+                        return;
+                    }
                 }
             }
             executor = Executors.newFixedThreadPool(Integer.parseInt(xcCount));
             while (!StringUtils.isEmpty(line = reader.readLine())) {
                 if (counter == 0) {
                     colnum = line.split(strFg);
-                    String sql=creatTable(colnum,newtableName);
-                    list.add(sql);
-                    countjv=service.upLoad(list);
-                    if(countjv==0){
-                        MessageBox.show(this,"导入失败");
-                        return;
+                    if(xxtype.equals("全量")){
+                        String sql=creatTable(colnum,newtableName);
+                        list.add(sql);
+                        countjv=service.upLoad(list);
+                        if(countjv==0){
+                            MessageBox.show(this,"导入失败");
+                            return;
+                        }
+                        list.clear();
                     }
-                    list.clear();
                 }else{
-                    list.add(insertSql(colnum,line,newtableName));
+                    if(xxtype.equals("全量")){
+                        list.add(insertSql(colnum,line,newtableName));
+                    }else{
+                        String xj=UIUtil.getStringValueByDS(null,"select count(*) from user_tab_columns where table_name=upper('"+newtableName+"')");
+                        String [] xjstr=line.split(strFg);
+                        if(Integer.parseInt(xj)==xjstr.length){
+                            list.add(insertSql(colnum,line,newtableName));
+                        }else{
+                            MessageBox.show(this,"导入文件的列数与数据库中的列数不一,请核对");
+                            return;
+                        }
+                    }
                 }
                 if(list.size()==2000){
                     final List<String> newList=new ArrayList<String>();
@@ -180,7 +200,6 @@ public class BigFileUpload extends AbstractWorkPanel implements BillListHtmlHref
                             newList.clear();
                         }
                     });
-
                 }
                 counter++;
             }
@@ -200,13 +219,18 @@ public class BigFileUpload extends AbstractWorkPanel implements BillListHtmlHref
             executor.shutdown();
             while (true) {
                 if (executor.isTerminated() && countjv>0) {
-                    MessageBox.show(this,"导入成功");
+                    if(xxtype.equals("全量")){
+                        String count=UIUtil.getStringValueByDS(null,"select count(*) from "+newtableName+"");
+                        promptHyperlinks(this,"成功导入了【"+count+"】条数据如果与导入文件的数据不一,需要替换导入文化的换行符，参考:","https://jingyan.baidu.com/article/c85b7a64a1a773003bac9508.html");
+                    }else{
+                        promptHyperlinks(this,"成功导入了【"+(counter-1)+"】条数据如果与导入文件的数据不一,需要替换导入文化的换行符，参考:","https://jingyan.baidu.com/article/c85b7a64a1a773003bac9508.html");
+                    }
                     reader.close();
+                    MessageBox.show(this,"导入成功");
                     break;
                 }
                 Thread.sleep(200);
             }
-
         }catch (Exception e){
             e.printStackTrace();
         }
@@ -294,7 +318,7 @@ public class BigFileUpload extends AbstractWorkPanel implements BillListHtmlHref
 
     /**
      * 封装insertSQL语句
-     * @param list
+     * @param tablename
      * @param colnum
      * @param str
      */
@@ -313,5 +337,88 @@ public class BigFileUpload extends AbstractWorkPanel implements BillListHtmlHref
             e.printStackTrace();
         }
         return insert.getSQL();
+    }
+
+    /**
+     * zzl
+     * 提示超链接
+     */
+    private void promptHyperlinks(Container _parent, String str, final String url){
+        BillDialog billDialog=new BillDialog(_parent);
+        JLabel website = new JLabel();
+        website.setText("<html> "+str+":<a href=''>https://jingyan.baidu.com/article/c85b7a64a1a773003bac9508.html</a></html>");
+        website.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        website.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent mouseEvent) {
+                try {
+                    Desktop.getDesktop().browse(new URI(url));
+                } catch (Exception ex) {
+                }
+            }
+        });
+        billDialog.add(website);
+        billDialog.setTitle("提示");
+        billDialog.setSize(getTextWidth(str),getTextHeight(str));
+        billDialog.setLocationRelativeTo(null);//窗体居中显示
+        billDialog.setVisible(true);
+    }
+
+    /**
+     * 取得宽度
+     * @return
+     */
+    private int getTextWidth(String str_content) {
+        if (str_content == null) {
+            return 275;
+        }
+        String[] str_rowtexts = str_content.split("\n"); //
+        int li_maxlength = 25; //
+        for (int i = 0; i < str_rowtexts.length; i++) {
+            int li_words = getTBUtil().getStrWidth(LookAndFeel.font, str_rowtexts[i]) + 70; //
+            //System.out.println("字数["+li_words+"]");  //
+            if (li_words > li_maxlength) {
+                li_maxlength = li_words; //找出最多一行字的个数
+            }
+        }
+
+        int li_width = li_maxlength * 1; //
+
+        if (li_width < 275) {
+            li_width = 275;
+        }
+
+        if (li_width > 900) {
+            li_width = 900;
+        }
+        return li_width;
+    }
+
+    /**
+     * 取得高度
+     * @return
+     */
+    private int getTextHeight(String str_content) {
+        if (str_content == null) {
+            return 120;
+        }
+
+        int li_width = getTextWidth(str_content ); //
+        String[] str_rowtexts = str_content.split("\n"); //
+        int li_rows = 0;
+        for (int i = 0; i < str_rowtexts.length; i++) {
+            int li_words = getTBUtil().getStrWidth(LookAndFeel.font, str_rowtexts[i]); //
+            li_rows = li_rows + ((li_words / li_width) + 1); //
+        }
+        int li_height = li_rows * 22 + 70; //
+
+        if (li_height < 120) {
+            li_height = 120;
+        }
+
+        if (li_height > 600) {
+            li_height = 600;
+        }
+        return li_height; //
     }
 }

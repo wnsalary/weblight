@@ -103,7 +103,7 @@ public class IndexChartPanel extends JPanel implements ActionListener {
 	private MouseListener mouseListener = null; //
 	private boolean isRefresh = true; //
 	private TBUtil tbUtil = new TBUtil(); //
-	private  int x = 10;
+	private  int x = 730;
 	private JPanel text=null;
 	private javax.swing.Timer timer = null; //
 
@@ -1211,11 +1211,11 @@ public class IndexChartPanel extends JPanel implements ActionListener {
 				FontMetrics fm = g.getFontMetrics();
 				int strWidth = fm.stringWidth(str);							// 得到字符串的宽度
 				int width = text.getWidth();								// 得到显示屏的宽度
-				if(x < 0 && Math.abs(x) > width){
-					x = 10;
+				if(x < 0 && Math.abs(x) > width+strWidth){
+					x = 730;
 				}
 				g.drawString(str, x, 80);
-				g.drawString(str, strWidth + 10 + x, 80);
+//				g.drawString(str, strWidth + 10+ x + str.length() , 80);
 			}
 			@Override
 			public void update(Graphics g) {
@@ -1232,7 +1232,7 @@ public class IndexChartPanel extends JPanel implements ActionListener {
 			public void run() {
 				try {
 					while(true){
-						// 改变显示的位置 
+						// 改变显示的位置
 						x = x - 4;
 						text.updateUI();
 						repaint();

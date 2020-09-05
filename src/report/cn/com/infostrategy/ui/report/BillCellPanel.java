@@ -343,6 +343,8 @@ public class BillCellPanel extends BillPanel implements ActionListener {
 
 		if (bo_isshowtoolbar) {
 			panel_root.add(getTitleBtnBar(), BorderLayout.NORTH); // 加入按钮栏
+		}else{
+			panel_root.add(getTitleBtnBar(1), BorderLayout.NORTH); // 加入按钮栏
 		}
 
 		mainPanel = new JPanel(); //
@@ -577,7 +579,7 @@ public class BillCellPanel extends BillPanel implements ActionListener {
 	}
 
 	/**
-	 * 
+	 *
 	 * @return
 	 */
 	public JToolBar getTitleBtnBar() { //
@@ -717,7 +719,165 @@ public class BillCellPanel extends BillPanel implements ActionListener {
 		}
 		return toolbar;
 	}
+	/**
+	 * zzl 2020-8-31 根据数字显示按钮可以扩展
+	 * @return
+	 */
+	public JToolBar getTitleBtnBar(int type) { //
+		if(type > 0){
+			JPanel panel_1 = new JPanel(new FlowLayout(FlowLayout.LEFT, 2, 0)); //
+			toolbar = new JToolBar("Btn", JToolBar.HORIZONTAL); //
+			toolbar.setBackground(LookAndFeel.systembgcolor); //
+			toolbar.setLayout(new BorderLayout(0, 2)); //
+			toolbar.setFloatable(false);
+			toolbar.setMargin(new Insets(1, 1, 3, 1));
+			toolbar.setRollover(true); //
+			btn_save = new WLTButton("保存"); //
+			btn_exportExcel = new WLTButton("导出Excel");
+			btn_inputExcel = new WLTButton("导入Excel");
+			btn_save.addActionListener(this);
+			btn_exportExcel.addActionListener(this);
+			btn_inputExcel.addActionListener(this);
+			panel_1.add(btn_save);
+			panel_1.add(btn_exportExcel);
+			panel_1.add(btn_inputExcel);
+			toolbar.add(panel_1, BorderLayout.NORTH);
+		}else if (toolbar == null) {
+			JPanel panel_1 = new JPanel(new FlowLayout(FlowLayout.LEFT, 2, 0)); //
+			JPanel panel_2 = new JPanel(new FlowLayout(FlowLayout.LEFT, 2, 0)); //
 
+			toolbar = new JToolBar("Btn", JToolBar.HORIZONTAL); //
+			toolbar.setBackground(LookAndFeel.systembgcolor); //
+			toolbar.setLayout(new BorderLayout(0, 2)); //
+			toolbar.setFloatable(false);
+			toolbar.setMargin(new Insets(1, 1, 3, 1));
+			toolbar.setRollover(true); //
+
+			btn_new = new WLTButton("新建"); //
+			btn_save = new WLTButton("保存"); //
+			btn_open = new WLTButton("打开"); //
+			btn_exportsql = new WLTButton("导出SQL"); //
+
+			// 添加新功能 武坤萌
+			btn_exportExcel = new WLTButton("导出Excel");
+			btn_inputExcel = new WLTButton("导入Excel");
+			btn_exportXML = new WLTButton("导出XML");
+			btn_importXML = new WLTButton("导入XML");
+
+			btn_new.addActionListener(this);
+			btn_save.addActionListener(this);
+			btn_open.addActionListener(this);
+			btn_exportsql.addActionListener(this);
+			btn_exportExcel.addActionListener(this);
+			btn_inputExcel.addActionListener(this);
+			btn_exportXML.addActionListener(this);
+			btn_importXML.addActionListener(this);
+
+			panel_1.add(btn_new);
+			panel_1.add(btn_save);
+			panel_1.add(btn_open);
+			if (ClientEnvironment.getInstance().isAdmin()) {
+				panel_1.add(btn_exportsql);
+				panel_1.add(btn_exportExcel);
+				panel_1.add(btn_inputExcel);
+				panel_1.add(btn_exportXML);
+				panel_1.add(btn_importXML);
+			}
+
+			btn_combine = new WLTButton(UIUtil.getImage("office_071.gif")); //
+			btn_split = new WLTButton(UIUtil.getImage("office_149.gif")); //
+			btn_combine.setToolTipText("合并单元格"); //
+			btn_split.setToolTipText("分割单元格"); //
+			btn_combine.addActionListener(this);
+			btn_split.addActionListener(this);
+
+			panel_2.add(btn_combine);
+			panel_2.add(btn_split);
+
+			btn_forecolor = new WLTButton("前景"); //
+			btn_backcolor = new WLTButton("背景"); //
+			btn_forecolor.addActionListener(this); //
+			btn_backcolor.addActionListener(this); //
+
+			panel_2.add(btn_forecolor);
+			panel_2.add(btn_backcolor);
+
+			combox_fonttype = new JComboBox(); //
+			GraphicsEnvironment ge = GraphicsEnvironment.getLocalGraphicsEnvironment();
+			String fontNames[] = ge.getAvailableFontFamilyNames();
+			for (int i = 0; i < fontNames.length; i++) {
+				combox_fonttype.addItem(fontNames[i]); //
+			}
+			combox_fonttype.setSelectedIndex(0); //
+			combox_fonttype.setPreferredSize(new Dimension(125, 20));
+			combox_fonttype.addActionListener(this);
+			panel_2.add(combox_fonttype);
+
+			combox_fontstyle = new JComboBox(); //
+			combox_fontstyle.addItem("PLAIN"); //
+			combox_fontstyle.addItem("BOLD"); //
+			combox_fontstyle.addItem("ITALIC"); //
+			combox_fontstyle.setSelectedIndex(0); //
+			combox_fontstyle.setPreferredSize(new Dimension(70, 20));
+			combox_fontstyle.addActionListener(this);
+			panel_2.add(combox_fontstyle);
+
+			combox_fontsize = new JComboBox(); //
+			combox_fontsize.addItem("10"); //
+			combox_fontsize.addItem("11"); //
+			combox_fontsize.addItem("12"); //
+			combox_fontsize.addItem("13"); //
+			combox_fontsize.addItem("14"); //
+			combox_fontsize.addItem("16"); //
+			combox_fontsize.addItem("20"); //
+			combox_fontsize.addItem("35"); //
+			combox_fontsize.setSelectedIndex(1); //
+			combox_fontsize.setPreferredSize(new Dimension(50, 20));
+			combox_fontsize.addActionListener(this);
+			panel_2.add(combox_fontsize);
+
+			combox_celltype = new JComboBox(); //
+			combox_celltype.addItem(ITEMTYPE_TEXT); // 文本框
+			combox_celltype.addItem(ITEMTYPE_NUMBERTEXT); // 数字框
+			combox_celltype.addItem(ITEMTYPE_TEXTAREA); // 多行文本框
+			combox_celltype.addItem(ITEMTYPE_CHECKBOX); // 勾选框
+			combox_celltype.addItem(ITEMTYPE_COMBOBOX); // 下拉框
+			combox_celltype.addItem(ITEMTYPE_DATE); // 日历.
+			combox_celltype.addItem(ITEMTYPE_DATETIME); // 时间.
+			combox_celltype.setSelectedIndex(0); //
+			combox_celltype.setPreferredSize(new Dimension(85, 20));
+			combox_celltype.addActionListener(this);
+			panel_2.add(combox_celltype);
+
+			btn_left = new WLTButton(UIUtil.getImage("align_left.gif")); //
+			btn_center = new WLTButton(UIUtil.getImage("align_center.gif")); //
+			btn_right = new WLTButton(UIUtil.getImage("align_right.gif")); //
+			btn_top = new WLTButton(UIUtil.getImage("valign_top.gif")); //
+			btn_middle = new WLTButton(UIUtil.getImage("valign_middle.gif")); //
+			btn_bottom = new WLTButton(UIUtil.getImage("valign_bottom.gif")); //
+			checkbox_showCellKey = new JCheckBox("显示CellKey", false); //
+			checkbox_showCellKey.setToolTipText("是否显示CellKey"); //
+			btn_left.addActionListener(this);
+			btn_center.addActionListener(this);
+			btn_right.addActionListener(this);
+			btn_top.addActionListener(this);
+			btn_middle.addActionListener(this);
+			btn_bottom.addActionListener(this);
+			checkbox_showCellKey.addActionListener(this); //
+
+			panel_2.add(btn_left);
+			panel_2.add(btn_center);
+			panel_2.add(btn_right);
+			panel_2.add(btn_top);
+			panel_2.add(btn_middle);
+			panel_2.add(btn_bottom);
+			panel_2.add(checkbox_showCellKey);
+
+			toolbar.add(panel_1, BorderLayout.NORTH);
+			toolbar.add(panel_2, BorderLayout.SOUTH);
+		}
+		return toolbar;
+	}
 	public void setToolBarVisiable(boolean _visiable) {
 		getTitleBtnBar().setVisible(_visiable); //
 		textfield_status.setVisible(_visiable); //
@@ -2228,7 +2388,7 @@ public class BillCellPanel extends BillPanel implements ActionListener {
 	}
 
 	/**
-	 * 
+	 *
 	 * @param source
 	 * @param x
 	 * @param y
@@ -3047,7 +3207,6 @@ public class BillCellPanel extends BillPanel implements ActionListener {
 	/**
 	 * 
 	 * @param _billno
-	 * @param hashmap
 	 * @throws Exception
 	 */
 	public void SaveBillData(String _billno) throws Exception {
