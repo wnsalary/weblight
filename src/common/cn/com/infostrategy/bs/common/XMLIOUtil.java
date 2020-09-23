@@ -100,12 +100,13 @@ public class XMLIOUtil {
 		ByteArrayInputStream byin = new ByteArrayInputStream(textarea.getBytes("GBK")); // 读入xml内容
 		org.jdom.Document doc = new org.jdom.input.SAXBuilder().build(byin); // 加载XML,生成一个document对象
 		ArrayList al = new ArrayList();
-		java.util.List al_billtemplets = doc.getRootElement().getChildren("billtemplet"); // 遍历所有模板
+		java.util.List al_billtemplets = doc.getRootElement().getChildren(); // 遍历所有模板
 		for (int i = 0; i < al_billtemplets.size(); i++) {
 			org.jdom.Element node_billtemplet = (org.jdom.Element) al_billtemplets.get(i); // 每个模板结点对象
 
 			// 处理主表信息
 			InsertSQLBuilder isql_1 = new InsertSQLBuilder("pub_templet_1"); //
+			System.out.println(">>>>>>>>>>>>>>>"+node_billtemplet.getChild("TEMPLETCODE").getText());
 			commdmo.executeUpdateByDS(str_dataSource, "delete from pub_templet_1_item where pk_pub_templet_1 in (select pk_pub_templet_1 from pub_templet_1 where templetcode = '" + node_billtemplet.getChild("templetcode").getText() + "')");
 			commdmo.executeUpdateByDS(str_dataSource, "delete from pub_templet_1 where templetcode ='" + node_billtemplet.getChild("templetcode").getText() + "'");
 			String pk_pub_templet_1 = new CommDMO().getSequenceNextValByDS(null, "S_PUB_TEMPLET_1");

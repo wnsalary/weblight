@@ -1,6 +1,8 @@
 package cn.com.infostrategy.ui.sysapp.other;
 
 import cn.com.infostrategy.bs.common.RemoteCallServlet;
+import cn.com.infostrategy.bs.common.ServerEnvironment;
+import cn.com.infostrategy.to.common.DataSourceVO;
 import cn.com.infostrategy.to.common.HashVO;
 import cn.com.infostrategy.to.common.TBUtil;
 import cn.com.infostrategy.to.common.WLTLogger;
@@ -151,7 +153,7 @@ public class BigFileUpload extends AbstractWorkPanel implements BillListHtmlHref
             String[] colnum=null;
             String newtableName=tableName+"_"+data.replace("-","");
             if(xxtype.equals("全量")){
-                HashVO [] vos=UIUtil.getHashVoArrayByDS(null,"select * from dba_tables where TABLE_NAME='"+newtableName.toUpperCase()+"' and TABLESPACE_NAME='HZDB'");
+                HashVO [] vos=UIUtil.getHashVoArrayByDS(null,"select * from dba_tables where TABLE_NAME='"+newtableName.toUpperCase()+"' and TABLESPACE_NAME='"+ ClientEnvironment.getInstance().getDataSourceVOs()[0].getUser().toUpperCase()+"'");
                 if(vos.length>0){
                     int count=MessageBox.showConfirmDialog(this,"日期"+data+"的数据已存在，点击确定覆盖，点击关闭取消");
                     if(count==0){

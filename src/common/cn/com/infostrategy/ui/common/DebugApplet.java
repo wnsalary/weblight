@@ -58,7 +58,7 @@ public class DebugApplet extends JApplet {
 		try {
 			str_sourceCode = getURlHtml(_url, "logintype=desktop"); //远程访问取得源代码
 			appletParmMap = parseHtmlContent(str_sourceCode); //解析源码成哈希表
-			final JFrame frame = new JFrame("普信咨询WebPush开发环境 - " + System.getProperty("URL")); //
+			final JFrame frame = new JFrame("德勤咨询WebPush开发环境 - " + System.getProperty("URL")); //
 			frame.getRootPane().putClientProperty("WebPushFrameMark", "WebPushRootFrame"); //
 
 			Font font = new Font("宋体", Font.PLAIN, 12); //

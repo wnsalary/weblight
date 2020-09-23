@@ -1,8 +1,6 @@
 package cn.com.infostrategy.ui.mdata;
 
-import java.awt.BorderLayout;
-import java.awt.Dimension;
-import java.awt.FlowLayout;
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
@@ -11,14 +9,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Vector;
 
-import javax.swing.AbstractAction;
-import javax.swing.JComboBox;
-import javax.swing.JFileChooser;
-import javax.swing.JLabel;
-import javax.swing.JOptionPane;
-import javax.swing.JPanel;
-import javax.swing.JTextField;
-import javax.swing.SwingConstants;
+import javax.swing.*;
 
 import cn.com.infostrategy.to.common.HashVO;
 import cn.com.infostrategy.to.common.HashVOStruct;
@@ -27,11 +18,7 @@ import cn.com.infostrategy.to.common.WLTConstants;
 import cn.com.infostrategy.to.mdata.BillVO;
 import cn.com.infostrategy.to.mdata.templetvo.AbstractTMO;
 import cn.com.infostrategy.to.mdata.templetvo.DefaultTMO;
-import cn.com.infostrategy.ui.common.AbstractWorkPanel;
-import cn.com.infostrategy.ui.common.MessageBox;
-import cn.com.infostrategy.ui.common.SplashWindow;
-import cn.com.infostrategy.ui.common.UIUtil;
-import cn.com.infostrategy.ui.common.WLTButton;
+import cn.com.infostrategy.ui.common.*;
 
 /*
  * 元原模板配置..
@@ -45,6 +32,7 @@ public class MetaTempletConfigPanel extends AbstractWorkPanel implements ActionL
 	private WLTButton btn_search, btn_config_dev, btn_config_app, btn_import, btn_delete, btn_copy, btn_compare, btn_importxml, btn_exportxml, btn_exportxml_all, btn_preview; //
 	private BillListPanel blp_main;
 	private FrameWorkMetaDataServiceIfc service = null;
+	private final TextArea textArea=new TextArea();
 
 	/**
 	 * 是否是实施人员配置!!!
@@ -434,45 +422,44 @@ public class MetaTempletConfigPanel extends AbstractWorkPanel implements ActionL
 	 * 从一个XML中导入模板!!!
 	 */
 	private void onImportXMLTemplet() {//导入XML格式模版
-		//		final BillDialog dialog = new BillDialog(this, "导入XML", 1000, 700);  //
-		//		dialog.setLayout(new BorderLayout());
-		//		textArea.setBackground(Color.WHITE); //
-		//		textArea.setForeground(Color.BLUE); //
-		//		textArea.setFont(new Font("宋体", Font.PLAIN, 12));
-		//		textArea.select(0, 0); //
-		//
-		//		JPanel jp = new JPanel();
-		//		jp.setLayout(new FlowLayout(FlowLayout.CENTER));
-		//		WLTButton confirm = new WLTButton("确定");
-		//		WLTButton cancel = new WLTButton("取消");
-		//		confirm.addActionListener(new ActionListener() {
-		//			public void actionPerformed(ActionEvent e) {
-		//				try {
-		//					if (textArea == null || textArea.getText().trim().equals("") || textArea.getText() == null) {
-		//						MessageBox.show("请输入需要导入的模版!!");
-		//						return;
-		//					}
-		//					FrameWorkMetaDataServiceIfc service = (FrameWorkMetaDataServiceIfc) UIUtil.lookUpRemoteService(FrameWorkMetaDataServiceIfc.class); //
-		//					service.importXMLTemplet(null, textArea.getText()); //导入模板!!!
-		//					MessageBox.show(MetaTempletConfigPanel.this, "导入XML格式模版成功!!!");
-		//				} catch (Exception ex) {
-		//					ex.printStackTrace(); //
-		//				}
-		//				textArea.setText("");
-		//				dialog.dispose();
-		//			}
-		//		});
-		//		cancel.addActionListener(new ActionListener() {
-		//			public void actionPerformed(ActionEvent e) {
-		//				dialog.dispose();
-		//
-		//			}
-		//		});  //
-		//		jp.add(confirm);
-		//		jp.add(cancel);
-		//		dialog.getContentPane().add(new JScrollPane(textArea), BorderLayout.CENTER); //
-		//		dialog.getContentPane().add(jp, BorderLayout.SOUTH);
-		//		dialog.setVisible(true); //
+				final BillDialog dialog = new BillDialog(this, "导入XML", 1000, 700);  //
+				dialog.setLayout(new BorderLayout());
+				textArea.setBackground(Color.WHITE); //
+				textArea.setForeground(Color.BLUE); //
+				textArea.setFont(new Font("宋体", Font.PLAIN, 12));
+				textArea.select(0, 0); //
+				JPanel jp = new JPanel();
+				jp.setLayout(new FlowLayout(FlowLayout.CENTER));
+				WLTButton confirm = new WLTButton("确定");
+				WLTButton cancel = new WLTButton("取消");
+				confirm.addActionListener(new ActionListener() {
+					public void actionPerformed(ActionEvent e) {
+						try {
+							if (textArea == null || textArea.getText().trim().equals("") || textArea.getText() == null) {
+								MessageBox.show("请输入需要导入的模版!!");
+								return;
+							}
+							FrameWorkMetaDataServiceIfc service = (FrameWorkMetaDataServiceIfc) UIUtil.lookUpRemoteService(FrameWorkMetaDataServiceIfc.class); //
+							service.importXMLTemplet(null, textArea.getText()); //导入模板!!!
+							MessageBox.show(MetaTempletConfigPanel.this, "导入XML格式模版成功!!!");
+						} catch (Exception ex) {
+							ex.printStackTrace(); //
+						}
+						textArea.setText("");
+						dialog.dispose();
+					}
+				});
+				cancel.addActionListener(new ActionListener() {
+					public void actionPerformed(ActionEvent e) {
+						dialog.dispose();
+
+					}
+				});  //
+				jp.add(confirm);
+				jp.add(cancel);
+				dialog.getContentPane().add(textArea, BorderLayout.CENTER); //
+				dialog.getContentPane().add(jp, BorderLayout.SOUTH);
+				dialog.setVisible(true); //
 	}
 
 	/**
